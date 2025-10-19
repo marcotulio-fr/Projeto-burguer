@@ -1,102 +1,60 @@
-const menuOptions = [
-    { name: 'X-Salada', price: 30, vegan: false, src: '/img/xsalada.jpeg' },
-    { name: 'X-Bacon', price: 34, vegan: false, src: '/img/xbacon.png' },
-    { name: 'X-Bacon Egg', price: 39, vegan: false, src: '/img/bacon-egg.png' },
-    { name: 'Monstruoso', price: 50, vegan: false, src: '/img/monstruoso.png' },
-    { name: 'Big Vegano', price: 55, vegan: true, src: '/img/xvegan.png' },
-    { name: 'X-Vegan', price: 45, vegan: true, src: '/img/monstruoso-vegan.png' }
-]
+const list = document.querySelector(".frame_produtos")
+const buttonShowAll = document.querySelector(".show-all")
+const buttonMapItens = document.querySelector(".map-itens")
+const buttonSumAll = document.querySelector(".sum-all")
+const buttonFilterItens = document.querySelector(".filter-all")
 
-let containerProdutos = document.querySelector(".frame_produtos")
-const buttonMapear = document.getElementById("mapear")
+function FormatCurrency(value) {
+    const newValue = value.toLocaleString('pt-br', {
+        style: 'currency',
+        currency: 'BRL',
+    })
+    return newValue
+}
 
-function mostrarProdutos() {
+function showall(arrayProd) {
 
-    let htmlProdutos = ""
-    let priceFormated = ""
-    menuOptions.forEach(prd => {
-        priceFormated = new Intl.NumberFormat("pt-BR",
-            {
-                style: "currency",
-                currency: "BRL"
-            }).format(prd.price)
+    let myLi = ""
 
-        htmlProdutos = htmlProdutos + ` 
+    arrayProd.forEach(prd => {
+
+        myLi += `
         <li>
             <img src= "${prd.src}">
             <p>${prd.name}</p>
-            <p class="price">${priceFormated}</p>
+            <p class="price">${FormatCurrency(prd.price)}</p>
         </li>`
-        containerProdutos.innerHTML = htmlProdutos
-
     })
+
+    list.innerHTML = myLi
+}
+
+function mapItensDescont() {
+    const newPrice = menuOptions.map((prd) => ({
+        ...prd,
+        price: prd.price * 0.9,
+
+    }))
+    showall(newPrice)
 
 }
 
-function mapearPrice() {
+function sumAllItens() {
+    const totalValue = menuOptions.reduce((acc, curr) => acc + curr.price, 0)
 
-    const newPrice = menuOptions.map(price => {
-        price.price = price.price - (price.price / 10)
-
-        return price
-
-    })
-    buttonMapear.textContent = "Desconto Ativo";
-    buttonMapear.disabled = true;
-
-    mostrarProdutos()
-
-}
-
-function reducePrice() {
-
-    const somaTotal = menuOptions.reduce((acc, price) => {
-        return acc + price.price
-    }, 0)
-
-    let somaTotalFormated = new Intl.NumberFormat("pt-BR",
-        {
-            style: "currency",
-            currency: "BRL"
-        }).format(somaTotal)
-
-    containerProdutos.innerHTML = `<li>
+    list.innerHTML = `<li>
             <p>O valor total da sua compra foi:</p>
-            <p class="price">${somaTotalFormated}</p>
+            <p class="price">${FormatCurrency(totalValue)}</p>
         </li>`
-
 }
 
+function filterItens() {
+    const filterJusVengan = menuOptions.filter(prd => prd.vegan)
 
-function FilterProdutos() {
-
-    const produtosFiltrados = menuOptions.filter(prd => prd.vegan === true)
-
-    let htmlFiltrados = ""
-    let priceFormatedFilter = ""
-
-    produtosFiltrados.forEach(prd => {
-
-        priceFormatedFilter = new Intl.NumberFormat("pt-BR",
-            {
-                style: "currency",
-                currency: "BRL"
-            }).format(prd.price)
-
-
-
-        htmlFiltrados = htmlFiltrados + `<li>
-            <img src= "${prd.src}">
-            <p>${prd.name}</p>
-            <p class="price">${priceFormatedFilter}</p>
-        </li>`
-    })
-    containerProdutos.innerHTML = htmlFiltrados
+    showall(filterJusVengan)
 
 }
-
-window.addEventListener('DOMContentLoaded', () => {
-
-    mostrarProdutos()
-
-})
+buttonShowAll.addEventListener('click', () => showall(menuOptions))
+buttonMapItens.addEventListener('click', mapItensDescont)
+buttonSumAll.addEventListener('click', sumAllItens)
+buttonFilterItens.addEventListener('click', filterItens)
